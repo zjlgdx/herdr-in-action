@@ -6,7 +6,7 @@
 
 全自主编码智能体（Claude Code、Codex、Antigravity 等）正在重构软件开发流程，开发者正从单兵编码转向多智能体并发调度。传统的终端复用器（tmux、Zellij）无法感知终端窗格内程序的语义与生命周期，在多 Agent 并行场景下产生两大痛点：一是智能体遇到高危操作或人工审批弹窗时陷入静默挂起（Blocked），开发者在多窗口间巡检成本极高；二是传统复用器缺乏面向 Agent 的标准双工控制面，无法形成机机协同闭环。
 
-针对该痛点，前期已完成《Herdr 全景实战与精通指南》（Kindle Scribe 速查版），并在本地搭建了 Herdr 0.9.0 运行环境。同时，本地已固化工程级智能体结对协议 `one-shot-pairing`（v0.4.2），其核心规范将 `herdr` 窗格注入列为第一优先级通道。本设计的目的在于建立系统性实操仓库 `herdr-in-action`，打通深水区机制演练（状态钩子逆向、Socket 控制流、Git Worktree 拓扑隔离、Claude Code Cross-Session 跨会话通信，以及 `one-shot-pairing` 终极作战室形态落地），产出 7 篇硬核实战手记并发布至《灯下》个人博客（Lamplight）。
+针对该痛点，前期已完成《Herdr 全景实战与精通指南》（Kindle Scribe 速查版），并在本地搭建了 Herdr 0.9.0 运行环境。同时，本地已固化工程级智能体结对协议 `one-shot-pairing`（v0.4.2，最新收编了经多轮 Codex 审校锤炼的 `panel.sh` 异构面板体系），其核心规范将 `herdr` 窗格注入列为第一优先级通道。本设计的目的在于建立系统性实操仓库 `herdr-in-action`，打通深水区机制演练（状态钩子逆向、Socket 控制流、Git Worktree 拓扑隔离、Claude Code Cross-Session 跨会话通信，以及 `one-shot-pairing` 终极作战室形态落地），产出 7 篇硬核实战手记并发布至《灯下》个人博客（Lamplight）。
 
 ## Discussion
 
@@ -47,12 +47,12 @@
 
 - **EP3: 拓扑工程与并发隔离（Worktrees & Workspaces）**
   - 核心矛盾：多 Agent 同时修改同一个代码仓库导致的文件写入锁与上下文污染。
-  - 实战演练：利用 `herdr worktree` 与 `herdr workspace` 绑定，为不同 Agent 分配物理隔离的独立分支与工作目录；吸收 `one-shot-pairing` 经验，验证在 detached worktree 上运行异构评审面板秒级跳过 `node_modules` 扫描的加速收益。
+  - 实战演练：利用 `herdr worktree` 与 `herdr workspace` 绑定，为不同 Agent 分配物理隔离的独立分支与工作目录；吸收 `one-shot-pairing` 固化的 `panel.sh` 经验，验证在 detached worktree 上并发跑异构评审面板跳过 `node_modules` 扫描的秒级收工机制，测试负载争抢规避（E2E 测试避开高负载成员）与信号中断清理（INT/TERM trap）。
   - 实验产物：`ep3-worktree-topology/setup-worktrees.sh`、`ep3-worktree-topology/notes.md`。
 
 - **EP4: 智能体结对与自治编排（One-Shot Pairing on Herdr）**
   - 核心矛盾：如何让主控 Agent 拥有全局终端调度能力，实现无人值守端到端交付？
-  - 实战演练：以 `one-shot-pairing` 的 `herdr` 通道为实战抓手，演示 Navigator 在主窗格运筹帷幄，通过 Herdr Socket API 拉起 Driver 窗格注入任务书；侧边栏实时监控 Driver 的 Working 与 Blocked 状态，演示人工一键切入放行；对比 Claude 原生 Cross-Session Messaging（同构总线）与 Herdr CLI 调派 Codex/Agy 顾问面板（异构视角）的协同流。
+  - 实战演练：以 `one-shot-pairing` 的 `herdr` 通道为实战抓手，演示 Navigator 在主窗格运筹帷幄，通过 Herdr Socket API 拉起 Driver 窗格注入任务书；侧边栏实时监控 Driver 的 Working 与 Blocked 状态，演示人工一键切入放行；实测 `panel.sh` 异构调度规范（macOS `nohup` 守候、Codex `--inline` 任务书内联与 Agy 流式落盘熔断）；对比 Claude 原生 Cross-Session Messaging（同构总线）与 Herdr 驱动异构顾问面板的协同流。
   - 实验产物：`ep4-autonomous-pairing/pairing-harness.sh`、`ep4-autonomous-pairing/notes.md`。
 
 - **EP5: 跨机漫游与算力分流（Remote Fleet & Persistence）**
@@ -79,7 +79,7 @@
 
 - Claude Code 版本要求 → 默认要求本地安装 v2.1.224 或更高版本：Cross-Session Messaging 在该版本后原生提供，保证实验可复现。
 - `one-shot-pairing` 运行通道 → 默认以 Herdr 为第一优先级通道进行实测验证，保留 Subagent 作为离线对比基准。
-- 异构 Agent 顾问面板 → 默认探活本地 `codex` 与 `agy`：若某 CLI 未就绪，自动降级为单模型评审，并在运行日志中记录。
+- 异构 Agent 顾问面板 → 默认探活本地 `codex` 与 `agy`，执行 `panel.sh` 固化的 `--inline` 任务书与流式检查逻辑。
 - 题图生成执行方式 → 默认优先使用本地 `chatgpt-imagegen` CLI：严格遵循 Lamplight 单一琥珀光源文人水墨规范，生成后统一压缩为 WebP。
 
 ## Testing
@@ -87,5 +87,6 @@
 - **设计验证**：运行 `bash /Users/yvan/developer/yy-skills/design-brainstorm/scripts/check-design-doc.sh docs/designs/2026-09-10-herdr-curriculum-design.md`，退出码为 0。
 - **实验验证**：每个 `epN/` 目录下的自动化脚本均包含严格的前置状态检查（`set -euo pipefail`）与断言，可在本地终端无报错复现。
 - **结对通道探测验证**：在 Herdr 环境中运行 `one-shot-pairing` 的 `detect-channel.sh`，确认输出识别为 `herdr` 而非降级的 `subagent`。
+- **面板孤儿与陷阱验证**：在 detached worktree 环境模拟发送 INT/TERM 信号，断言工作树已自动 prune 且清理无残留。
 - **同步一致性验证**：在 Lamplight 仓库执行 `node scripts/sync-herdr-notes.mjs --check`，比对源笔记与发布手记的内容差异，无差异时退出码为 0。
 - **博客构建与回归**：发布前在 Lamplight 执行 `npm test` 和 `npm run build`，确保所有笔记预渲染、sitemap 与 RSS feed 均构建成功。
