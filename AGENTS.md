@@ -49,7 +49,7 @@ docs/designs/   # 课程体系设计（仅供参考，不是需求文档）
 
 ## 完成定义
 
-一课完成 = 作者亲手跑通验收脚本 + `notes.md` 写完并发布到 blog.aixie.de/notes。
+一课完成 = 作者亲手跑通验收脚本 + `notes.md` 绘制水墨题图并发布部署到 blog.aixie.de/notes（遵循 Lamplight 发布流水线）。
 
 ## 文风
 
