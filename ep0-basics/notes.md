@@ -76,28 +76,40 @@ default              running  /Users/yvan/.config/herdr                        /
 
 ### 2. 终端作战室布局：工作区、标签页与窗格
 
-初次启动 `herdr` 进入 TUI 界面，整个终端界面分为四个核心区块：
+初次启动 `herdr` 进入 TUI，屏幕分三块：左边侧边栏，右边窗格区，标签栏只盖在窗格区上方、不跨侧边栏。
 
 ```text
-┌──────────────┬───────────────────────────────┐
-│ 侧边栏       │ 标签栏: [agents] [server] (+) │
-│ (Sidebar)    ├───────────────┬───────────────┤
-│              │ 窗格 1        │ 窗格 2        │
-│ ▼ project-a  │ (Pane 1)      │ (Pane 2)      │
-│   ◐ claude   │               │               │
-│   × codex    │ $ claude      │ $ codex       │
-│              │ ◐ working     │ × blocked     │
-│ ▶ project-b  ├───────────────┴───────────────┤
-│              │ 状态/模式栏: [NORMAL]         │
-└──────────────┴───────────────────────────────┘
+┌───────────────────┬──────────────────────────────┐
+│ spaces            │  1   logs   +                │
+│                   ├──────────────────────────────┤
+│ ◐ project-a       │ ┌ claude ───┐ ┌ codex ─────┐ │
+│   main            │ │ $ claude  │ │ $ codex    │ │
+│ ○ project-b       │ │           │ │            │ │
+│   feat/login      │ │           │ │            │ │
+│ new           menu│ │           │ │            │ │
+├───────────────────┤ │           │ │            │ │
+│ agents    priority│ │           │ │            │ │
+│ × project-b       │ │           │ │            │ │
+│   codex           │ │           │ │            │ │
+│ ◐ project-a       │ │           │ │            │ │
+│   claude          │ └───────────┘ └────────────┘ │
+│                  «│                              │
+└───────────────────┴──────────────────────────────┘
 ```
 
-四层核心概念的层级关系：
+侧边栏自己分上下两个面板（配置项 `[ui.sidebar.spaces]` 与 `[ui.sidebar.agents]`，见 `herdr --default-config`）：上半 `spaces` 按空间列，每个空间两行——状态符号加名字、分支加 git 状态；横线以下是 `agents`，面板头右侧写着当前排序模式（`agent_panel_sort`，图里是 `priority`），每个 Agent 同样两行。状态符号只在侧边栏出现，窗格上能看到的是边框标题里的 Agent 标签（`┌ claude ───┐`，需 `show_agent_labels_on_pane_borders = true`）。左下角 `«` 收起侧边栏，快捷键 `prefix+b`。
 
-1. **工作区（Workspace）**：最外层的顶层项目容器。建议**一个项目/仓库或一项独立任务分配一个 Workspace**。左侧侧边栏汇总显示该工作区内所有 Agent 的聚合状态徽章。
-2. **标签页（Tab）**：工作区内的独立视口。类似浏览器的标签，可切分为 `agents`、`server`、`logs` 等不同视口，互不遮挡干扰。
+窗格区底部常态是空的——Herdr 没有常驻状态栏。它只有 terminal / prefix / navigate 三种模式（herdr.dev concepts 页），按下前缀键进 prefix 模式，最底行才浮出一行提示条：
+
+```text
+ PREFIX  esc cancel  ctrl+b send prefix  w workspace nav  ? keybinds
+```
+
+三层核心概念的层级关系，侧边栏是这三层的观察窗：
+
+1. **工作区（Workspace）**：最外层的顶层项目容器。建议**一个项目/仓库或一项独立任务分配一个 Workspace**。侧边栏 `spaces` 面板汇总显示该工作区内所有 Agent 的聚合状态徽章。
+2. **标签页（Tab）**：工作区内的独立视口。类似浏览器的标签，可以按 `agents`、`server`、`logs` 分开放，互不遮挡干扰。新建标签默认用生成名（`1`、`2`……），`prefix+shift+t` 改名，标签栏末尾的 `+` 也能点。
 3. **窗格（Pane）**：真正的终端 PTY 实例。可以在一个 Tab 内左右（垂直）或上下（水平）随意切分。每个窗格独立运行一个 Shell 或自主编码智能体（如 Claude Code、Codex）。
-4. **侧边栏（Sidebar）**：全局注意力中枢。实时显示所有 Workspace 及其名下的 Agent 列表与实时状态符号（`◐` / `×` / `✓` / `○`），支持鼠标直接点击切窗，也可折叠。
 
 ### 3. 鼠标和快捷键
 
