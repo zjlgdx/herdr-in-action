@@ -74,7 +74,33 @@ default              running  /Users/yvan/.config/herdr                        /
 
 所有通信走 `/Users/yvan/.config/herdr/herdr.sock` 这一个 UNIX 域套接字。
 
-### 2. 鼠标和快捷键
+### 2. 终端作战室布局：工作区、标签页与窗格
+
+初次启动 `herdr` 进入 TUI 界面，整个终端界面分为四个核心区块：
+
+```text
+┌─────────────────┬────────────────────────────────────────────────────────┐
+│ 侧边栏 Sidebar  │ 标签栏 Tab Bar: [agents] [server] [logs] (+)           │
+│                 ├────────────────────────────┬───────────────────────────┤
+│ ▼ workspace-1   │ 窗格 Pane 1 (w1:p1)        │ 窗格 Pane 2 (w1:p2)       │
+│   ● claude (w1) │                            │                           │
+│   × codex  (w2) │ $ claude                   │ $ codex                   │
+│                 │ ╭─── Claude Code ────────╮ │ ╭─── Codex ─────────────╮ │
+│ ▶ workspace-2   │ │ ◐ working              │ │ │ × blocked (审批中)    │ │
+│                 │ ╰────────────────────────╯ │ ╰───────────────────────╯ │
+│                 ├────────────────────────────┴───────────────────────────┤
+│                 │ 状态栏 / 模式栏 Mode Bar: [NORMAL] ctrl+b ? for help   │
+└─────────────────┴────────────────────────────────────────────────────────┘
+```
+
+四层核心概念的层级关系：
+
+1. **工作区（Workspace）**：最外层的顶层项目容器。建议**一个项目/仓库或一项独立任务分配一个 Workspace**。左侧侧边栏汇总显示该工作区内所有 Agent 的聚合状态徽章。
+2. **标签页（Tab）**：工作区内的独立视口。类似浏览器的标签，可切分为 `agents`、`server`、`logs` 等不同视口，互不遮挡干扰。
+3. **窗格（Pane）**：真正的终端 PTY 实例。可以在一个 Tab 内左右（垂直）或上下（水平）随意切分。每个窗格独立运行一个 Shell 或自主编码智能体（如 Claude Code、Codex）。
+4. **侧边栏（Sidebar）**：全局注意力中枢。实时显示所有 Workspace 及其名下的 Agent 列表与实时状态符号（`◐` / `×` / `✓` / `○`），支持鼠标直接点击切窗，也可折叠。
+
+### 3. 鼠标和快捷键
 
 Herdr 默认鼠标全覆盖——点击切窗格、拖分割线、右键菜单、滚轮翻页。键盘快捷键是可选加速层。
 
@@ -99,7 +125,7 @@ $ herdr pane layout
 {"id":"cli:pane:layout","result":{"layout":{"area":{"height":40,"width":120,"x":0,"y":0},"focused_pane_id":"w1:p3","panes":[{"focused":false,"pane_id":"w1:p1","rect":{"height":40,"width":60,"x":0,"y":0}},{"focused":true,"pane_id":"w1:p3","rect":{"height":40,"width":60,"x":60,"y":0}}],"splits":[{"direction":"right","id":"split_0_root","ratio":0.5,"rect":{"height":40,"width":120,"x":0,"y":0}}],"tab_id":"w1:t1","workspace_id":"w1","zoomed":false},"type":"pane_layout"}}
 ```
 
-### 3. 五态模型与"已看"判定
+### 4. 五态模型与"已看"判定
 
 下表的符号和配色直接来自 Herdr 源码 `shell.rs` 中的 `status_icon()` 和 `status_color()` 函数。配置 `status_indicators = "symbols"` 后侧边栏渲染的就是这些字形：
 
@@ -133,7 +159,7 @@ evidence: "❯\n"
 
 Herdr 抓到了 Claude Code 提示符的特征规则 `live_prompt_box`，判定为 `idle`。`agent explain` 用的是服务端活跃的检测清单缓存，反映当前真实的判定逻辑。
 
-### 4. 配置（`config.toml`）
+### 5. 配置（`config.toml`）
 
 默认配置偏保守。多 Agent 场景下调两个关键项：`agent_panel_sort = "priority"` 让 blocked/done 置顶，`status_indicators = "symbols"` 让色彩受限终端也能分辨状态。
 
