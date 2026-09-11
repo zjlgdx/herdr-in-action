@@ -1,0 +1,44 @@
+# ep0-basics/config.toml
+# Herdr 0.9.0 生产级作战室参考配置
+# 用于建立高信息密度、注意力优先、断网不丢状态的持久化多 Agent 作战环境。
+#
+# 校验命令:
+#   HERDR_CONFIG_PATH=ep0-basics/config.toml herdr config check
+
+onboarding = false
+
+[theme]
+# 默认采用 catppuccin，暗色对比度清晰
+name = "catppuccin"
+
+[terminal]
+# 新建或切分窗格时，继承当前活动窗格的目录（避免反复 cd）
+new_cwd = "follow"
+
+[ui]
+# 侧边栏排序策略：
+# "spaces" 按工作区拓扑分组；
+# "priority" 切换为注意力队列：需要人拍板的 (blocked)、刚做完的 (done) 置顶，其次是 working 与 idle。
+agent_panel_sort = "priority"
+
+# 状态指示器外观：
+# "dots" 为紧凑纯色圆点；
+# "symbols" 为明确字形徽章，跨终端或色彩受限时识别度更高。
+status_indicators = "symbols"
+
+# 在窗格边框顶栏直接渲染识别到的 Agent 标识与状态（不看侧边栏也能知道当前窗格归属）
+show_agent_labels_on_pane_borders = true
+
+# 窗格间保留视觉微缝，分屏边界更清晰
+pane_gaps = true
+
+# 鼠标滚轮每次滚动的行数
+mouse_scroll_lines = 3
+
+[session]
+# 守护进程或系统重启后，通过官方集成钩子自动按 Session Ref 恢复 Agent 原生会话
+resume_agents_on_restore = true
+
+[keys]
+# 前缀键绑定（保持类 tmux 肌肉记忆，同时支持原生鼠标一键点击切窗格）
+prefix = "ctrl+b"
