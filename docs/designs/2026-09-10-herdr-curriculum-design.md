@@ -21,7 +21,7 @@ Herdr 0.9.0 已在本地跑起来，前期完成了《Herdr 全景实战与精�
 
 在跨会话协作上，Claude Code 2.1.224 起原生提供 Cross-Session Messaging（`ListAgents` / `SendMessage`），解决同构会话之间的文本直连。它的安全设计要求发给 bypass-permissions 会话的消息必须扣住等人批准（`crossSessionInbound`），所以受阻会话依然会无声挂起。Herdr 作为拓扑与状态基座，负责第一时间把 Blocked 标红并提供一键切入。两者是“L1/L2 拓扑与感知 + L3 语义总线”的上下层关系，而不是替代关系。
 
-在状态模型上，纠正了早期文档“三态”的说法。Herdr 实际有五态：idle、working、blocked、done、unknown。idle 与 done 的区别不在 Agent 本身，而在“这个完成有没有被人看过”：focus 会把它标记为已看，read 不会，每个 TUI 客户端独立追踪。这个区别直接决定“一眼就知道该看哪个窗格”能不能成立，因此放进 EP1 作为核心演练。
+在状态模型上，纠正了早期文档“三态”的说法。Herdr 实际有五态：idle、working、blocked、done、unknown。idle 与 done 的区别不在 Agent 本身，而在“这个完成有没有被人看过”：focus 会把它标记为已看，read 不会，每个 TUI 客户端独立追踪；完成发生在当前活动标签页时直接记为已看，不会出现 done。这个区别直接决定“一眼就知道该看哪个窗格”能不能成立，因此放进 EP1 作为核心演练。
 
 ## Approach
 
@@ -44,10 +44,10 @@ Herdr 0.9.0 已在本地跑起来，前期完成了《Herdr 全景实战与精�
 
 - **EP1: 让 Herdr 替我盯着（Hooks & State Detection）**
   - 能力跃迁：不再巡检窗口。Agent 停下来或卡在审批，侧边栏先于我知道。
-  - 核心矛盾：Herdr 怎么知道模型停下了？钩子拿不到状态时靠什么兜底？
-  - 演练：先执行 `herdr integration install claude` 把钩子升到当前版本（本地实测 v7 落后于 v9，逆向旧钩子会得出错误结论）；用 `mock-agent.sh` 模拟 idle → working → blocked → done 全流程，观察侧边栏变化；用 `herdr agent explain` 看钩子缺席时的缓冲区兜底判定；实测 idle 与 done 的“已看过”区别。
-  - 验收：mock 进入 blocked 后 10 秒内侧边栏标红；切入窗格放行后自动回到 working。
-  - 产物：`ep1-hooks-detection/mock-agent.sh`、`ep1-hooks-detection/notes.md`。
+  - 核心矛盾：Herdr 怎么知道模型停下了？判不出来的时候会显示成什么？
+  - 演练：先执行 `herdr integration install claude` 把钩子升到当前版本。每种 Agent 只有一个状态权威（agents.mdx「Status authority」）：Claude Code、Codex 的集成自 0.6.7 起只报会话 ID，状态全靠屏幕清单匹配，屏幕检测是主路而不是兜底，逆向钩子推不出状态机制。用 `mock-agent.sh` 走上报通路（`pane report-agent` 的 seq 与 release）；用真 Claude Code 审批框与 `fake-claude.sh` 走屏幕通路，`herdr agent explain --file` 离线重放；实测陌生审批框回落 idle、在后台标签页亮 done；实测完成发生在当前活动标签页时直接记为已看；在临时 `XDG_CONFIG_HOME` 下演练本地覆盖清单（整份替换远端清单）。
+  - 验收：mock 与假 Claude 进入 blocked 后 10 秒内被判定；放行后回到 working；陌生审批框回落 idle 并在后台显示 done；覆盖清单只写一条规则会让远端规则失效。
+  - 产物：`ep1-hooks-detection/mock-agent.sh`、`ep1-hooks-detection/fake-claude.sh`、`ep1-hooks-detection/verify-detection.sh`、`ep1-hooks-detection/notes.md`。
 
 - **EP2: 让一个 Agent 指挥另一个（Socket API & Automation）**
   - 能力跃迁：写一段脚本就能拉起 Agent、注入任务、等它做完、读回结果，人不用碰键盘。

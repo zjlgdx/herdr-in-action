@@ -155,6 +155,7 @@ $ herdr pane layout
 - 用鼠标点击或快捷键切进该窗格，`done` → `idle`
 - CLI 执行 `herdr pane focus` 或 `herdr agent focus`，同上
 - `pane read` / `agent read` 读输出，**不消费** `done`
+- 完成发生在**当前活动标签页**里（且外层终端没失焦），服务端直接记为已看，不会出现 `done`。源码见 `src/app/actions.rs` 的 `apply_pane_state_change()`，实测记录在 EP1
 - 每个 TUI 客户端的 Seen 状态独立——客户端 A 看过不影响客户端 B 的 Done 徽章
 
 问服务端"你是怎么判定这个窗格状态的"：
