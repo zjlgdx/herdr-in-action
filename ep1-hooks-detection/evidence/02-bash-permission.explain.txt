@@ -1,0 +1,5 @@
+agent: claude
+state: blocked
+manifest: remote:/Users/yvan/.local/state/herdr/agent-detection/remote/claude.toml 2026.09.11.1
+rule: bash_permission_prompt (region=whole_recent priority=850)
+evidence: "\n ▐▛███▛█   Claude Code v2.1.283\n▝▜██████▀  Opus 5.5 · Claude Max\n ▝▝   ▝▝   /…/-Users-yvan-Projects-herdr-in-action/0a420e5c-d31f-4b08-b039-05ea0cb01341/scratchpad/lab · /rc\n\n\n❯ Use the Bash tool to run exactly: touch ep1-probe.txt\n\n  Crea..."

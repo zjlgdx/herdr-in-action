@@ -1,0 +1,5 @@
+agent: claude
+state: blocked
+manifest: remote:/Users/yvan/.local/state/herdr/agent-detection/remote/claude.toml 2026.09.11.1
+rule: live_blocked_form (region=after_last_horizontal_rule priority=980)
+evidence: " Accessing workspace:\n\n /private/tmp/claude-501/-Users-yvan-Projects-herdr-in-action/0a420e5c-d31f-4b08-b039-05ea0cb01341/scratchpad/lab\n\n Quick safety check: Is this a project you created or one you trust? (Like your own code, a well-known..."
